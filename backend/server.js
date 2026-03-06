@@ -11,7 +11,10 @@ const PORT = process.env.PORT || 3001;
 const db = new Database();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://niche-finder-frontend.onrender.com', 'https://niche-finder-api-man3.onrender.com'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static('public'));
 
