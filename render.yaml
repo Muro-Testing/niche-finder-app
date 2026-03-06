@@ -12,6 +12,8 @@ services:
     envVars:
       - key: PUBLIC_URL
         value: "https://niche-finder-frontend.onrender.com"
+      - key: VITE_API_URL
+        value: "https://niche-finder-app-man3.onrender.com/api"
     
   # Backend API Service
   - type: web
