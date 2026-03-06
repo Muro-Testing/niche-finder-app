@@ -10,29 +10,43 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const db = new Database();
 
-// Middleware
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    const allowedOrigins = [
-      'https://niche-finder-frontend.onrender.com',
-      'https://niche-finder-api-man3.onrender.com',
-      'http://localhost:3000',
-      'http://localhost:5173'
-    ];
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
+const defaultAllowedOrigins = [
+  'https://niche-finder-frontend.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+
+const envAllowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])];
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  // Allow Render preview/static subdomains in production deployments.
+  return /^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(origin);
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+      return;
     }
+    callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+};
+
+// Middleware
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(express.static('public'));
