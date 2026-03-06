@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import NicheList from './components/NicheList';
 import ContactList from './components/ContactList';
 import type { Niche } from './services/api';
@@ -18,11 +18,6 @@ function App() {
     setSelectedNiche(null);
     setSelectedCompany(null);
     setView('niches');
-  };
-
-  const handleSelectCompany = (companyName: string) => {
-    setSelectedCompany(companyName);
-    setView('contacts');
   };
 
   return (
